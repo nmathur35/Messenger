@@ -7,6 +7,7 @@
 //
 
 import SwiftUI
+import Firebase
 
 struct ContentView: View {
     
@@ -41,6 +42,19 @@ struct MsgPage: View{
     
     var name = ""
     var body : some View{
-        Text("hello")
+        Text(name).navigationBarTitle("Chats", displayMode: .large)
     }
+}
+
+class observer: ObservableObject{
+
+    @Published var msgs = [datatype]()
+    
+}
+
+struct datatype: Identifiable{
+    var id: String
+    var name: String
+    var msg: String
+    
 }
