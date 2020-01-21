@@ -49,7 +49,16 @@ struct MsgPage: View{
         //Text(name).navigationBarTitle("Chats", displayMode: .large)
         VStack{
         List(msg.msgs){ i in
-            Text(i.msg)
+            //Text(i.msg)
+            if i.name == self.name{
+                MsgRow(msg:i.msg, user: i.name, myMsg: true)
+            }
+            else{
+                MsgRow(msg:i.msg, user: i.name, myMsg: false)
+            }
+            
+            
+            
         }.navigationBarTitle("Chats", displayMode: .large)
         
             HStack{
@@ -57,6 +66,8 @@ struct MsgPage: View{
                 TextField("Msg", text: $typedmsg  ).textFieldStyle(RoundedBorderTextFieldStyle())
                 
                 Button(action: {
+                    self.msg.addMsg(msg: self.typedmsg, user: self.name)
+                    self.typedmsg = ""
                     
                 }){
                     Text("Send")
@@ -82,14 +93,27 @@ class observer: ObservableObject{
             
             for i in snap!.documentChanges{
                 if i.type == .added{
-                    let name = i.document.get("name") as! String
-                    let msg = i.document.get("msg") as! String
+                    let name = i.document.get("name") as? String
+                    let msg = i.document.get("msg") as? String
                     let id = i.document.documentID
                     
-                    self.msgs.append(datatype(id: id, name: name, msg: msg))
+                    self.msgs.append(datatype(id: id, name: name ?? "default", msg: msg ?? "default"))
                     
                 }
             }
+        }
+    }
+    
+    func addMsg(msg: String, user: String){
+        let db = Firestore.firestore()
+        db.collection("msgs").addDocument(data: ["msg" : msg, "user": user]){
+            (err) in
+            
+            if  err != nil{
+                print((err?.localizedDescription)!)
+                return
+                }
+            print("success")
         }
     }
     
@@ -100,4 +124,23 @@ struct datatype: Identifiable{
     var name: String
     var msg: String
     
+}
+
+struct MsgRow: View{
+    var msg = ""
+    var user = ""
+    var myMsg = true
+    
+    var body: some View{
+        HStack{
+            if myMsg{
+                Spacer()
+Text(msg).padding(8).background(Color.blue).cornerRadius(6).foregroundColor(Color.white)
+            }
+            else{
+                Text(msg).padding(8).background(Color.green).cornerRadius(6).foregroundColor(Color.white)
+                Spacer()
+            }
+        }
+    }
 }
