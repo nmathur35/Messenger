@@ -126,6 +126,7 @@ struct datatype: Identifiable{
     
 }
 
+//Niharika added this section
 struct MsgRow: View{
     var msg = ""
     var user = ""
